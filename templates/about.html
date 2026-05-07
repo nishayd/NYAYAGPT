@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Legal AI - About</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    background: #020617;
+    overflow-x: hidden;
+    color: white;
+}
+
+/* NAVBAR */
+.navbar{
+    position:fixed;
+    width:100%;
+    padding:20px 60px;
+    display:flex;
+    justify-content:space-between;
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.05);
+    z-index:1000;
+}
+
+.navbar a{
+    color:white;
+    margin-left:25px;
+    text-decoration:none;
+}
+
+/* HERO */
+.hero {
+    height: 100vh;
+    display: flex;
+}
+
+/* LEFT SIDE */
+.left {
+    width: 50%;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    animation: slideLeft 1.2s ease;
+}
+
+.left h1 {
+    font-size: 50px;
+    color: #facc15;
+}
+
+.left p {
+    margin-top: 15px;
+    color: #cbd5f5;
+}
+
+/* RIGHT SIDE */
+.right {
+    width: 90%;
+    background: url('https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA5L3Jhd3BpeGVsb2ZmaWNlMl9waG90b19vZl9hX2dvbGRlbl9zY2FsZV9sYXdfY29uY2VwdF9uYXR1cmFsX2xpZ19lNjJiZjJkYy0zZGQ1LTRmYWYtOTg3MS0yNDExM2JjYmY5MWZfMS5qcGc.jpg');
+    background-size: cover;
+    background-position: center;
+    animation: slideRight 1.2s ease;
+}
+
+/* PANELS */
+.panel-section {
+    padding: 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: 0.4s;
+    transform: translateY(40px);
+    opacity: 0;
+}
+
+.card.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    background: rgba(255,255,255,0.1);
+}
+
+.card h3 {
+    color: #facc15;
+    margin-bottom: 10px;
+}
+
+.card p {
+    color: #cbd5f5;
+}
+
+/* ANIMATIONS */
+@keyframes slideLeft {
+    from {transform: translateX(-100%);}
+    to {transform: translateX(0);}
+}
+
+@keyframes slideRight {
+    from {transform: translateX(100%);}
+    to {transform: translateX(0);}
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div><b>⚖️ Naai GPT</b></div>
+    <div>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('rag_assistant') }}">rag_assistant</a>
+        <a href="{{ url_for('signin') }}">Login</a>
+        <a href="{{ url_for('contact') }}">Contact</a>
+    </div>
+</div>
+
+<!-- HERO SPLIT -->
+<section class="hero">
+    <div class="left">
+        <div>
+            <h1>Legal AI System</h1>
+            <p style="font-size:20px; line-height:1.8; opacity:0.85;">
+Nyaya GPT is an AI-powered legal assistant designed to simplify and modernize the way legal information is accessed and understood. It aims to bridge the gap between complex legal systems and everyday users by providing quick, accurate, and intelligent legal insights. The platform uses advanced artificial intelligence and natural language processing to help users get instant legal guidance, generate documents, and analyze case-related information efficiently.
+</p>
+        </div>
+    </div>
+    <div class="right"></div>
+</section>
+
+<!-- PANELS -->
+<section class="panel-section">
+
+    <div class="card">
+        <h3>About Platform</h3>
+        <p>AI-powered system to resolve legal queries instantly.</p>
+    </div>
+
+    <div class="card">
+        <h3>Smart Assistance</h3>
+        <p>Combining legal knowledge with AI intelligence.</p>
+    </div>
+
+    <div class="card">
+        <h3>Efficiency</h3>
+        <p>Reduces research time and improves workflow.</p>
+    </div>
+
+    <div class="card">
+        <h3>Future Vision</h3>
+        <p>Building next-gen legal intelligence platform.</p>
+    </div>
+
+</section>
+
+<div class="footer">
+    © 2026 Legal AI
+</div>
+
+<!-- SCROLL ANIMATION -->
+<script>
+window.addEventListener("scroll", () => {
+    document.querySelectorAll(".card").forEach(card => {
+        let top = card.getBoundingClientRect().top;
+        if(top < window.innerHeight - 80){
+            card.classList.add("active");
+        }
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nayi GPT Auth</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+/* BACKGROUND */
+body {
+    background: radial-gradient(circle at top left, #0f172a, #020617);
+    overflow: hidden;
+    color:white;
+}
+
+/* NAVBAR */
+.navbar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    padding:18px 50px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(12px);
+    z-index:1000;
+}
+
+.navbar a{
+    color:white;
+    margin-left:20px;
+    text-decoration:none;
+    opacity:0.8;
+    font-size:14px;
+}
+
+.navbar a:hover{
+    opacity:1;
+}
+
+/* spacing fix for navbar */
+body{
+    padding-top:80px;
+}
+
+/* blobs */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.4;
+    animation: move 10s infinite alternate;
+}
+.blob1 {
+    width: 300px;
+    height: 300px;
+    background: #facc15;
+    top: 10%;
+    left: 10%;
+}
+.blob2 {
+    width: 250px;
+    height: 250px;
+    background: #3b82f6;
+    bottom: 10%;
+    right: 10%;
+}
+
+@keyframes move {
+    from { transform: translateY(0); }
+    to { transform: translateY(-50px); }
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+}
+
+/* INPUT */
+.input-group {
+    position: relative;
+}
+.input {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    outline: none;
+}
+.input-group span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: #facc15;
+    transition: 0.4s;
+}
+.input:focus + span {
+    width: 100%;
+}
+
+/* FORM */
+.form {
+    transition: all 0.4s ease;
+}
+.hide {
+    opacity: 0;
+    transform: translateX(40px);
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+}
+.show {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+    position: relative;
+}
+
+/* TAB */
+.tab {
+    cursor: pointer;
+}
+.active {
+    color: #facc15;
+    border-bottom: 2px solid #facc15;
+}
+
+</style>
+</head>
+
+<body class="text-white flex items-center justify-center h-screen">
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div><b>⚖️ Naai GPT</b></div>
+    <div>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+         <a href="{{ url_for('rag_assistant') }}">rag_assistant</a>
+        <a href="{{ url_for('contact') }}">Contact</a>
+    </div>
+</div>
+
+<!-- BACKGROUND BLOBS -->
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+
+<!-- CARD -->
+<div class="card w-full max-w-md relative">
+
+    <!-- LOGO -->
+    <div class="text-center mb-6">
+        <img src="{{ url_for('static', filename='unnamed.jpg') }}" 
+             style="width:60px;height:60px;border-radius:50%;margin:auto;border:1px solid rgba(255,255,255,0.2);">
+
+        <h2 style="margin-top:10px;font-size:22px;font-weight:700;
+        background:linear-gradient(90deg,#fff,#facc15);
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;">
+        ⚖️ Naai GPT
+        </h2>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex justify-between mb-6 text-gray-400">
+        <span id="loginTab" class="tab active" onclick="showLogin()">Login</span>
+        <span id="registerTab" class="tab" onclick="showRegister()">Register</span>
+    </div>
+
+    <!-- LOGIN -->
+<div id="loginForm" class="form show">
+    <form method="POST" action="{{ url_for('signin') }}">
+        <h2 class="text-xl font-bold mb-6">Welcome Back</h2>
+
+    <div class="input-group mb-4">
+    <input type="email" name="email" placeholder="Email" class="input" required>
+    <span></span>
+</div>
+
+<div class="input-group mb-6">
+    <input type="password" name="password" placeholder="Password" class="input" required>
+    <span></span>
+</div>
+
+        <button class="w-full bg-white text-black py-3 rounded-full font-bold">
+            Login
+        </button>
+    </form>
+</div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" class="form hide">
+
+<form method="POST" action="{{ url_for('signup') }}">
+
+    <h2 class="text-xl font-bold mb-6">Create Account</h2>
+
+    <div class="input-group mb-4">
+        <input type="text" name="name" placeholder="Full Name" class="input" required>
+        <span></span>
+    </div>
+
+    <div class="input-group mb-4">
+        <input type="email" name="email" placeholder="Email" class="input" required>
+        <span></span>
+    </div>
+
+    <div class="input-group mb-6">
+        <input type="password" name="password" placeholder="Password" class="input" required>
+        <span></span>
+    </div>
+    <div class="input-group mb-4">
+    <input type="password" name="confirm_password" placeholder="Confirm Password" class="input" required>
+    <span></span>
+</div>
+
+    <button type="submit" class="w-full bg-white text-black py-3 rounded-full font-bold">
+        Register
+    </button>
+
+</form>
+
+</div>
+
+<script>
+
+function showRegister(){
+    document.getElementById("loginForm").classList.replace("show","hide");
+    document.getElementById("registerForm").classList.replace("hide","show");
+
+    document.getElementById("registerTab").classList.add("active");
+    document.getElementById("loginTab").classList.remove("active");
+}
+
+function showLogin(){
+    document.getElementById("registerForm").classList.replace("hide","show");
+    document.getElementById("loginForm").classList.replace("show","hide");
+
+    document.getElementById("loginTab").classList.add("active");
+    document.getElementById("registerTab").classList.remove("active");
+}
+
+</script>
+
+</body>
+</html>

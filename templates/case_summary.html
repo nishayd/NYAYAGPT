@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Case Summary</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at top, #0f172a, #020617);
+    color: white;
+    font-family: sans-serif;
+}
+
+/* TOP HEADER */
+.header {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.header h1 {
+    font-size: 40px;
+    font-weight: bold;
+    color: #facc15;
+}
+
+.header p {
+    color: #aaa;
+    margin-top: 10px;
+}
+
+/* MAIN CONTAINER */
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* CARD STYLE */
+.card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+/* BUTTON */
+.btn {
+    background: #facc15;
+    color: black;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* FILE INPUT */
+input[type="file"] {
+    background: #111;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+}
+
+/* SUMMARY BOX */
+.summary {
+    background: #0a0a0a;
+    padding: 25px;
+    border-radius: 15px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    font-size: 15px;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media(max-width:768px){
+    .grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>⚖️ Case Summary AI</h1>
+    <p>Upload your legal PDF and get structured analysis instantly</p>
+</div>
+
+<div class="container">
+
+    <!-- UPLOAD -->
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <br><br>
+            <button class="btn">Generate Summary</button>
+        </form>
+    </div>
+
+    {% if summary %}
+
+    <!-- SUMMARY -->
+    <div class="card">
+        <h2 style="color:#facc15; font-size:22px; margin-bottom:15px;">
+            📄 Generated Summary
+        </h2>
+
+        <div class="summary">
+            {{ summary }}
+        </div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="card">
+        <h2 style="color:#facc15; font-size:20px; margin-bottom:15px;">
+            📊 Case Analysis Chart
+        </h2>
+
+        <canvas id="chart"></canvas>
+    </div>
+
+    <script>
+    new Chart(document.getElementById("chart"), {
+        type: "bar",
+        data: {
+            labels: ["Facts","Issues","Judgment","Conclusion"],
+            datasets: [{
+                label: "Word Distribution",
+                data: [
+                    {{ stats["FACTS"] }},
+                    {{ stats["ISSUES"] }},
+                    {{ stats["JUDGMENT"] }},
+                    {{ stats["CONCLUSION"] }}
+                ],
+                backgroundColor: "#facc15"
+            }]
+        }
+    });
+    </script>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
