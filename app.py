@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from database import db
 import pdfplumber
-import google.generativeai as genai
+from google import genai
 import time
 
 from models import User, QuestionHistory, UnansweredQuestion, ContactQuery
@@ -26,12 +26,11 @@ with app.app_context():
 # GEMINI CONFIG
 # =========================
 
-GEMINI_API_KEY = "AIzaSyDfJn6qHehacvLWh3qMuvYEkAhO9TsG9Qg"
+GEMINI_API_KEY = "[ENCRYPTION_KEY]"
 
-genai.configure(api_key=GEMINI_API_KEY)
+client =genai.Client(api_key=GEMINI_API_KEY)
 
 # Stable model for free tier
-model = genai.GenerativeModel("gemini-1.5-flash")
 
 
 # =========================
@@ -60,7 +59,7 @@ def analyze_case(case_text):
 
     try:
 
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(model="gemini-2.5-flash-lite",contents=prompt)
 
         return response.text
 
@@ -73,7 +72,7 @@ def analyze_case(case_text):
             time.sleep(30)
 
             try:
-                response = model.generate_content(prompt)
+                response = client.models.generate_content(model="gemini-2.5-flash-lite",contents=prompt)
                 return response.text
 
             except Exception as retry_error:
@@ -173,56 +172,51 @@ def about():
 # SIGNUP
 # =========================
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup',methods=['GET','POST'])    #register page
 def signup():
+        if request.method=='POST':
+                name=request.form['name']
+                email=request.form['email']
+                password=request.form['password']
+                confirm_password=request.form['confirm_password']
 
-    if request.method == 'POST':
+                if not name or len(name.strip())<2:
+                        flash('name must be atleast 2 character long','error')
+                        return redirect(url_for('signup'))
+                if not email or '@' not in email :
+                        flash('Invalid email','error')
+                        return redirect(url_for('signup'))
+                if not password or len(password)<8 or not any(char.isalpha() for char in password ) or not any(char.isdigit() for char in password) or not any (not char.isalnum() for char in password):
+                        flash('pass must be atleast 8 char long and contain letters and contain numbers and special characters','error')
+                        return redirect(url_for('signup'))
+                if confirm_password!=password:
+                        flash('Confirm password should match password','error')
+                        return redirect(url_for('signup'))
+                #check if user already exists
+                existing_user=User.query.filter_by(email=email).first()
+                if existing_user:
+                        flash('Email already exists.Please login. ','error')
+                        return redirect(url_for('signup'))
+                # generate hash password
+                hashed_password=generate_password_hash(password)
+                is_admin = (email.strip().lower() == 'admin@nyayagpt.com')
+                new_user=User(
+                        name=name.strip(),
+                        email=email.strip(),
+                        password=hashed_password,
+                        is_admin=is_admin
+                )
+                try:
+                        db.session.add(new_user)
+                        db.session.commit()
+                        flash('Registration successful .Proceed to signin','success')
+                        return redirect(url_for('signin'))
+                except Exception as e:
+                        db.session.rollback()
+                        flash('Some error occured while registering','error')
+                        return redirect(url_for('signup'))
 
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
-
-        if not name or len(name.strip()) < 2:
-            flash('Name must be at least 2 characters long', 'error')
-            return redirect(url_for('signup'))
-
-        if confirm_password != password:
-            flash('Passwords do not match', 'error')
-            return redirect(url_for('signup'))
-
-        if User.query.filter_by(email=email).first():
-            flash('Email already exists', 'error')
-            return redirect(url_for('signup'))
-
-        hashed_password = generate_password_hash(password)
-
-        is_admin = (email.strip().lower() == 'admin@nyayagpt.com')
-
-        new_user = User(
-            name=name.strip(),
-            email=email.strip(),
-            password=hashed_password,
-            is_admin=is_admin
-        )
-
-        try:
-
-            db.session.add(new_user)
-            db.session.commit()
-
-            flash('Registration successful', 'success')
-
-            return redirect(url_for('signin'))
-
-        except:
-
-            db.session.rollback()
-
-            flash('Error occurred', 'error')
-
-    return render_template('signup.html')
-
+        return render_template('signup.html')
 
 # =========================
 # RAG ASSISTANT
