@@ -12,7 +12,7 @@ from utils.rag_pipeline import rag_answer
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
 app.secret_key = 'secret_key'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -225,33 +225,44 @@ def signup():
 @app.route('/rag', methods=['GET', 'POST'])
 @login_required
 def rag_assistant():
-
     answer = None
     sources = []
 
     if request.method == "POST":
-
         query = request.form.get("query")
         sector = request.form.get("sector")
-
-        user_id = session.get('user_id')
-
+        
+        # Get year range from frontend slider
+        start_year = request.form.get("start_year", 1950)
+        end_year = request.form.get("end_year", 2025)
+        
         try:
+            start_year = int(start_year)
+            end_year = int(end_year)
+        except (ValueError, TypeError):
+            start_year, end_year = 1950, 2025
 
-            result = rag_answer(query, sector, user_id=user_id)
-
+        # Pass the current logged-in user's id and year range into the RAG pipeline
+        user_id = session.get('user_id')
+        try:
+            result = rag_answer(query, sector, start_year=start_year, end_year=end_year, user_id=user_id)
             answer = result["answer"]
             sources = result["sources"]
-
-        except:
-
-            answer = "Error occurred"
+        except FileNotFoundError as fnfe:
+            flash(str(fnfe), "warning")
+            answer = "Sorry, the legal database for this sector is currently being indexed. Please try again in a few minutes."
+            sources = []
+        except Exception as e:
+            flash(f"An error occurred: {str(e)}", "error")
+            answer = "An error occurred while processing your request."
             sources = []
 
     return render_template(
         "rag_assistant.html",
         answer=answer,
-        sources=sources
+        sources=sources,
+        start_year=request.form.get("start_year", 1950), # Preserve values for UI
+        end_year=request.form.get("end_year", 2025)
     )
 
 
@@ -356,21 +367,14 @@ def admin_dashboard():
 @app.route('/history')
 @login_required
 def get_history():
-
     user_id = session.get('user_id')
-
-    history = QuestionHistory.query.filter_by(
-        user_id=user_id
-    ).order_by(
-        QuestionHistory.timestamp.desc()
-    ).all()
-
+    history = QuestionHistory.query.filter_by(user_id=user_id).order_by(QuestionHistory.timestamp.desc()).all()
+    
     return [{
         "question": h.question,
         "sector": h.sector,
         "timestamp": h.timestamp.strftime("%Y-%m-%d %H:%M:%S")
     } for h in history]
-
 
 # =========================
 # LOGOUT
