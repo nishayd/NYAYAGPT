@@ -146,8 +146,13 @@ body{
     <div>
         <a href="{{ url_for('home') }}">Home</a>
         <a href="{{ url_for('about') }}">About</a>
-         <a href="{{ url_for('rag_assistant') }}">rag_assistant</a>
+        <a href="{{ url_for('rag_assistant') }}">RAG Assistant</a>
         <a href="{{ url_for('contact') }}">Contact</a>
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('signin') }}">Login</a>
+        {% endif %}
     </div>
 </div>
 

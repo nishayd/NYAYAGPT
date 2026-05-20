@@ -26,7 +26,7 @@ with app.app_context():
 # GEMINI CONFIG
 # =========================
 
-GEMINI_API_KEY = "[ENCRYPTION_KEY]"
+from config import GEMINI_API_KEY
 
 client =genai.Client(api_key=GEMINI_API_KEY)
 
@@ -82,15 +82,6 @@ def analyze_case(case_text):
 
 
 # =========================
-# HOME
-# =========================
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-
-# =========================
 # LOGIN REQUIRED
 # =========================
 
@@ -129,6 +120,15 @@ def admin_required(f):
         return f(*args, **kwargs)
 
     return decorated
+
+
+# =========================
+# HOME
+# =========================
+
+@app.route('/')
+def home():
+    return render_template('home.html')
 
 
 # =========================
@@ -385,7 +385,7 @@ def logout():
 
     session.clear()
 
-    return redirect(url_for('signin'))
+    return redirect(url_for('home'))
 
 
 # =========================

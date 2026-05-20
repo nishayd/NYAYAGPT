@@ -175,6 +175,7 @@ Contact Us
         {% if session.get('user_id') and user and user.is_admin %}
           <a href="/admin">Admin Dashboard</a>
         {% endif %}
+        <a href="/logout">Logout</a>
       {% else %}
         <a href="/signin">Sign In</a>
       {% endif %}

@@ -4,7 +4,7 @@ import os
 import numpy as np
 from utils.embedding import get_embedding
 
-SIMILARITY_THRESHOLD = 1.0   # Balanced threshold
+SIMILARITY_THRESHOLD = 1.8   # Relaxed threshold to prevent filtering out relevant documents
 
 
 def load_faiss_index(sector):
@@ -59,7 +59,7 @@ def retrieve_chunks(query, sector, top_k=5, start_year=None, end_year=None):
         adjusted_score = score - boost
         
         if adjusted_score <= SIMILARITY_THRESHOLD:
-            # Check for year filtering
+            # Check for year filtering (only filter if the document has a valid year metadata)
             if start_year or end_year:
                 chunk_year = chunk_meta.get("year")
                 if chunk_year is not None:
@@ -67,8 +67,6 @@ def retrieve_chunks(query, sector, top_k=5, start_year=None, end_year=None):
                         continue
                     if end_year and chunk_year > end_year:
                         continue
-                else:
-                    continue
 
             results_with_scores.append((adjusted_score, chunk_meta))
 

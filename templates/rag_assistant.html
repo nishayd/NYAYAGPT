@@ -307,10 +307,63 @@
       grid-template-columns: 1fr;
     }
   }
+
+  /* Loader Overlay CSS */
+  .loader-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.7); /* Deep slate semi-transparent */
+    backdrop-filter: blur(8px); /* Sleek modern blur */
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--white);
+    transition: opacity 0.3s ease;
+  }
+
+  .loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loader-text {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Premium Loader Overlay -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-spinner"></div>
+  <div class="loader-text">Grounded Legal AI Analyzing...</div>
+</div>
+
 <div class="app-container">
   <!-- Sidebar -->
   <div class="sidebar closed" id="sidebar">
@@ -343,6 +396,19 @@
       <header class="workspace-header">
         <h1 class="workspace-title">Legal Research Assistant</h1>
         <p class="workspace-subtitle">Empowering advocates with grounded empirical analysis across Supreme Court judgements and statutory laws.</p>
+        
+        <!-- Demo Queries Dropdown -->
+        <div class="demo-queries-container" style="margin-top: 1.5rem; background: var(--white); border: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; border-radius: 4px; box-shadow: var(--shadow-sm);">
+          <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-600); white-space: nowrap;">⚡ Landmark Case Demos:</span>
+          <select id="demoQueries" style="flex: 1; padding: 0.6rem 1rem; font-size: 0.95rem; border: 1px solid var(--border); background: var(--bg-light); cursor: pointer; outline: none; border-radius: 4px; font-family: var(--font-sans);">
+            <option value="" disabled selected>Select a historical case query to auto-populate the inquiry field...</option>
+            <option value="kesavananda" data-sector="cases" data-query="What is the Basic Structure Doctrine established in Kesavananda Bharati vs State Of Kerala?">1. Kesavananda Bharati (1973) - Basic Structure Doctrine</option>
+            <option value="maneka" data-sector="cases" data-query="What was the ruling on the right to travel abroad under Article 21 in Maneka Gandhi vs Union Of India?">2. Maneka Gandhi (1978) - Right to Travel Abroad (Art 21)</option>
+            <option value="dkbasu" data-sector="cases" data-query="What observations were made regarding custodial violence and torture in Shri D K Basu vs State Of West Bengal?">3. D.K. Basu (1996) - Custodial Violence & Torture</option>
+            <option value="lalita" data-sector="cases" data-query="What was the decision on the registration of FIR in cognizable offences in Lalita Kumari vs Govt Of U P?">4. Lalita Kumari (2013) - Mandatory FIR Registration</option>
+            <option value="indra" data-sector="cases" data-query="What is the ceiling limit on reservations and the concept of creamy layer in Indra Sawhney vs Union Of India?">5. Indra Sawhney (1992) - Ceiling on Reservations</option>
+          </select>
+        </div>
       </header>
 
       <div class="panels-grid">
@@ -503,6 +569,35 @@ sectorSelect.addEventListener('change', () => {
         }
     });
 });
+
+// Demo query auto-population logic
+const demoSelect = document.getElementById('demoQueries');
+if (demoSelect) {
+    demoSelect.addEventListener('change', () => {
+        const selectedOption = demoSelect.options[demoSelect.selectedIndex];
+        const query = selectedOption.getAttribute('data-query');
+        const sector = selectedOption.getAttribute('data-sector');
+        
+        if (query && sector) {
+            document.getElementById('query').value = query;
+            document.getElementById('sector').value = sector;
+            
+            // Trigger sector change to show/hide year slider if needed
+            sectorSelect.dispatchEvent(new Event('change'));
+        }
+    });
+}
+
+// Show loader on form submission
+const form = document.querySelector('form');
+if (form) {
+    form.addEventListener('submit', () => {
+        const loader = document.getElementById('loaderOverlay');
+        if (loader) {
+            loader.style.display = 'flex';
+        }
+    });
+}
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
