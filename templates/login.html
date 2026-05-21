@@ -240,20 +240,33 @@ body{
 <script>
 
 function showRegister(){
-    document.getElementById("loginForm").classList.replace("show","hide");
-    document.getElementById("registerForm").classList.replace("hide","show");
+    document.getElementById("loginForm").classList.add("hide");
+    document.getElementById("loginForm").classList.remove("show");
+    document.getElementById("registerForm").classList.add("show");
+    document.getElementById("registerForm").classList.remove("hide");
 
     document.getElementById("registerTab").classList.add("active");
     document.getElementById("loginTab").classList.remove("active");
 }
 
 function showLogin(){
-    document.getElementById("registerForm").classList.replace("hide","show");
-    document.getElementById("loginForm").classList.replace("show","hide");
+    document.getElementById("registerForm").classList.add("hide");
+    document.getElementById("registerForm").classList.remove("show");
+    document.getElementById("loginForm").classList.add("show");
+    document.getElementById("loginForm").classList.remove("hide");
 
     document.getElementById("loginTab").classList.add("active");
     document.getElementById("registerTab").classList.remove("active");
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('show') === 'register') {
+        showRegister();
+    } else {
+        showLogin();
+    }
+});
 
 </script>
 
