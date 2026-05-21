@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session
+from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -370,11 +370,11 @@ def get_history():
     user_id = session.get('user_id')
     history = QuestionHistory.query.filter_by(user_id=user_id).order_by(QuestionHistory.timestamp.desc()).all()
     
-    return [{
+    return jsonify([{
         "question": h.question,
         "sector": h.sector,
         "timestamp": h.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-    } for h in history]
+    } for h in history])
 
 # =========================
 # LOGOUT
